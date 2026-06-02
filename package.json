@@ -2,27 +2,25 @@
   "name": "telegraph-bot",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npx prisma generate && tsc",
+    "start": "npx prisma migrate deploy && node dist/index.js",
+    "dev": "ts-node src/index.ts"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
-    "@prisma/client": "^6.19.3",
-    "discord.js": "^14.26.4",
-    "dotenv": "^17.4.2",
-    "luxon": "^3.7.2",
-    "node-cron": "^4.2.1",
-    "prisma": "^6.19.3"
+    "@prisma/client": "^5.x.x",
+    "discord.js": "^14.x.x",
+    "dotenv": "^16.x.x",
+    "luxon": "^3.x.x",
+    "node-cron": "^3.x.x"
   },
   "devDependencies": {
-    "@types/luxon": "^3.7.1",
-    "@types/node": "^25.9.1",
-    "@types/node-cron": "^3.0.11",
-    "ts-node": "^10.9.2",
-    "typescript": "^6.0.3"
+    "@types/luxon": "^3.x.x",
+    "@types/node": "^20.x.x",
+    "@types/node-cron": "^3.x.x",
+    "prisma": "^5.x.x",
+    "ts-node": "^10.x.x",
+    "typescript": "^5.x.x"
   }
 }
