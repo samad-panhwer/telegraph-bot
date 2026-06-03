@@ -1,14 +1,15 @@
-import { Client, GatewayIntentBits, EmbedBuilder, REST, Routes, SlashCommandBuilder, ChatInputCommandInteraction, TextChannel } from 'discord.js';
+// 1. Updated Imports (Removed ChatInputCommandInteraction as it wasn't used)
+import { Client, GatewayIntentBits, EmbedBuilder, REST, Routes, SlashCommandBuilder, TextChannel } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
 import cron from 'node-cron';
 import { config } from 'dotenv';
 import http from 'http';
 
-// 1. Load Environment Variables FIRST
+// 2. Load Environment Variables
 config();
 
-// 2. Create a dummy server for Render (keeps it awake)
-http.createServer((req, res) => {
+// 3. Updated Server (Added underscore _req to fix the build error)
+http.createServer((_req, res) => {
   res.writeHead(200);
   res.end('Telegraph Bot is Running!');
 }).listen(process.env.PORT || 8080);
