@@ -4,16 +4,21 @@ import cron from 'node-cron';
 import { config } from 'dotenv';
 import http from 'http';
 
-// 1. Load Environment Variables
+// 1. Load Environment Variables IMMEDIATELY
 config();
 
-// 2. Stay-Awake Server for Render
+// 2. Start Web Server IMMEDIATELY (Before anything else)
+const PORT = process.env.PORT || 8080;
 http.createServer((_req, res) => {
   res.writeHead(200);
   res.end('Telegraph Bot is Running!');
-}).listen(process.env.PORT || 8080);
+}).listen(Number(PORT), '0.0.0.0', () => {
+  console.log(`🌍 Health check server listening on port ${PORT}`);
+});
 
+// 3. Now start the rest of your bot logic...
 const prisma = new PrismaClient();
+// ... (rest of your code)
 const client = new Client({ 
   intents: [
     GatewayIntentBits.Guilds, 

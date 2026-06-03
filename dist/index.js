@@ -9,10 +9,13 @@ const node_cron_1 = __importDefault(require("node-cron"));
 const dotenv_1 = require("dotenv");
 const http_1 = __importDefault(require("http"));
 (0, dotenv_1.config)();
+const PORT = process.env.PORT || 8080;
 http_1.default.createServer((_req, res) => {
     res.writeHead(200);
     res.end('Telegraph Bot is Running!');
-}).listen(process.env.PORT || 8080);
+}).listen(Number(PORT), '0.0.0.0', () => {
+    console.log(`🌍 Health check server listening on port ${PORT}`);
+});
 const prisma = new client_1.PrismaClient();
 const client = new discord_js_1.Client({
     intents: [
