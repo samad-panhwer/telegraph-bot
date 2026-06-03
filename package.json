@@ -9,7 +9,7 @@
     "dev": "ts-node src/index.ts"
   },
   "dependencies": {
-    "@prisma/client": "^5.x.x",
+    "@prisma/client": "^6.19.3",
     "discord.js": "^14.x.x",
     "dotenv": "^16.x.x",
     "luxon": "^3.x.x",
@@ -19,7 +19,7 @@
     "@types/luxon": "^3.x.x",
     "@types/node": "^20.x.x",
     "@types/node-cron": "^3.x.x",
-    "prisma": "^5.x.x",
+    "prisma": "^6.19.3",
     "ts-node": "^10.x.x",
     "typescript": "^5.x.x"
   }
