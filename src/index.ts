@@ -8,7 +8,6 @@ import http from 'http';
 config();
 
 // 2. IMMEDIATE PORT BINDING (Render Requirement)
-// We start the server BEFORE initializing the bot or DB to ensure Render sees an open port immediately.
 const PORT = process.env.PORT || 10000;
 http.createServer((_req, res) => {
     res.writeHead(200);
@@ -43,17 +42,18 @@ const commands = [
         .setDescription('Admin: Get total hours for all devs in the last 7 days'),
 ].map(command => command.toJSON());
 
-// 5. Bot Initialization
-client.once('ready', async () => {
-    console.log(`✅ Logged in as ${client.user?.tag}`);
+// 5. Consolidated Initialization Logic
+client.once('ready', async (c) => {
+    console.log(`✅ Telegraph Bot Online: ${c.user.tag}`);
     
+    // Register Slash Commands
     try {
         const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN!);
         await rest.put(
             Routes.applicationGuildCommands(process.env.CLIENT_ID!, process.env.GUILD_ID!), 
             { body: commands }
         );
-        console.log('✅ Slash Commands Registered');
+        console.log('✅ Slash Commands Registered Successfully');
     } catch (err) {
         console.error('❌ Command Registration Error:', err);
     }
@@ -61,8 +61,12 @@ client.once('ready', async () => {
     // Daily Summary Job (11:59 PM Asia/Karachi)
     cron.schedule('59 23 * * *', async () => {
         try {
+            console.log('Running Daily Summary Job...');
             const channel = client.channels.cache.get(process.env.SUMMARY_CHANNEL_ID!) as TextChannel;
-            if (!channel) return;
+            if (!channel) {
+                console.error('❌ Summary channel not found');
+                return;
+            }
 
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -96,11 +100,9 @@ client.on('interactionCreate', async (interaction) => {
     const { commandName, user, guild } = interaction;
     const member = guild?.members.cache.get(user.id);
     
-    // Role & Permission Checks
     const isDev = member?.roles.cache.has(process.env.DEVELOPER_ROLE_ID!);
     const isAdmin = member?.roles.cache.has(process.env.ADMIN_ROLE_ID!);
 
-    // Channel Security (Admins can run commands anywhere, Devs only in #dev-logs)
     if (interaction.channelId !== process.env.DEV_CHANNEL_ID && !isAdmin) {
         return interaction.reply({ content: "❌ Please use the designated dev channel.", ephemeral: true });
     }
@@ -188,13 +190,21 @@ client.on('interactionCreate', async (interaction) => {
         }
     } catch (err) {
         console.error('Interaction Error:', err);
-        await interaction.reply({ content: "⚠️ System Error: Unable to process command.", ephemeral: true });
+        if (interaction.replied || interaction.deferred) {
+            await interaction.followUp({ content: "⚠️ Error processing command.", ephemeral: true });
+        } else {
+            await interaction.reply({ content: "⚠️ Error processing command.", ephemeral: true });
+        }
     }
 });
 
-// Crash Protection: Catch all unhandled errors so the bot stays online
+// 7. Crash Protection & Final Startup
+process.on('uncaughtException', (err) => {
+    console.error('❌ CRITICAL ERROR:', err);
+});
+
 process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    console.error('❌ UNHANDLED REJECTION at:', promise, 'reason:', reason);
 });
 
 client.login(process.env.DISCORD_TOKEN);
